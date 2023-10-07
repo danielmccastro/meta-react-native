@@ -1,24 +1,27 @@
 import * as React from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import LittleLemonHeader from "./components/LittleLemonHeader";
 import LittleLemonFooter from "./components/LittleLemonFooter";
-import WelcomeScreen from "./components/WelcomeScreen"
+import WelcomeScreen from "./components/WelcomeScreen";
 export default function App() {
   return (
     <>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "#495E57",
-        }}
-      >
+      <View style={styles.container}>
         <LittleLemonHeader />
         <WelcomeScreen />
       </View>
-      <View style={{ backgroundColor: "#495E57" }}>
+      <View style={styles.footer}>
         <LittleLemonFooter />
       </View>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#333333",
+  },
+  footer: { backgroundColor: "#333333" },
+});
