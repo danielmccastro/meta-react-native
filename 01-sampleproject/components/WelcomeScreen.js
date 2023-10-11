@@ -1,19 +1,24 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   ScrollView,
   Text,
-  TextInput,
   StyleSheet,
   Image,
   View,
+  useColorScheme,
 } from "react-native";
 
 export default function WelcomeScreen() {
-  const [firstName, onChangeFirstName] = useState("");
+  const colorScheme = useColorScheme();
   return (
     <ScrollView
       indicatorStyle={"white"}
-      style={styles.container}
+      style={[
+        styles.container,
+        colorScheme === "light"
+          ? { backgroundColor: "#fff" }
+          : { backgroundColor: "#333333" },
+      ]}
       keyboardDismissMode="on-drag"
     >
       <View style={styles.headerWrapper}>
@@ -24,9 +29,21 @@ export default function WelcomeScreen() {
           accessible={true}
           accessibilityLabel={"Little Lemon Logo"}
         />
-        <Text style={styles.headerText}>Little Lemon</Text>
+        <Text
+          style={[
+            styles.headerText,
+            colorScheme === "light" ? { color: "black" } : { color: "white" },
+          ]}
+        >
+          Little Lemon
+        </Text>
       </View>
-      <Text style={styles.innerText}>
+      <Text
+        style={[
+          styles.innerText,
+          colorScheme === "light" ? { color: "black" } : { color: "white" },
+        ]}
+      >
         Little Lemon is a charming neighborhood bistro that serves simple food
         and classic cocktails in a lively but casual environment. We would love
         to hear your experience with us!
@@ -43,24 +60,13 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     paddingBottom: 10,
     fontSize: 30,
-    color: '#EDEFEE',
-    textAlign: 'center',
+    textAlign: "center",
   },
   innerText: {
     fontSize: 24,
     padding: 20,
     marginVertical: 8,
-    color: "#EDEFEE",
     textAlign: "center",
-  },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    fontSize: 16,
-    borderColor: "#EDEFEE",
-    backgroundColor: "#EDEFEE",
   },
   logo: {
     width: 100,
