@@ -1,44 +1,40 @@
-import { useState } from "react";
+import React, { useState } from 'react';
 import {
   ScrollView,
   Text,
   StyleSheet,
   TextInput,
   Pressable,
-} from "react-native";
+} from 'react-native';
 
-export default function LoginScreen() {
-  const [email, onChangeEmail] = useState("");
-  const [password, onChangePassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export default function LoginScreen({ navigation }) {
+  const [email, onChangeEmail] = useState('');
+  const [password, onChangePassword] = useState('');
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.headerText}>Welcome to Little Lemon</Text>
-      {isLoggedIn === true ? (
-        <Text style={styles.regularText}>You are logged in!</Text>
-      ) : (
-      <>
       <Text style={styles.regularText}>Login to continue </Text>
       <TextInput
-        style={styles.input}
-        placeholder="email"
+        style={styles.inputBox}
         value={email}
-        onChange={onChangeEmail}
-        keyboardType="email-address"
+        onChangeText={onChangeEmail}
+        placeholder={'email'}
+        keyboardType={'email-address'}
       />
       <TextInput
-        style={styles.input}
-        placeholder="password"
+        style={styles.inputBox}
         value={password}
-        onChange={onChangePassword}
-        keyboardType={"default"}
+        onChangeText={onChangePassword}
+        placeholder={'password'}
+        keyboardType={'default'}
         secureTextEntry={true}
       />
-        <Pressable style={styles.loginButton} onPress={() => setIsLoggedIn(!isLoggedIn)}>
-          <Text style={buttonText}>Log in</Text>
-        </Pressable>
-        </>
-      )}
+      <Pressable
+        onPress={() => navigation.navigate('Welcome')}
+        style={styles.button}>
+        <Text style={styles.buttonText}>Log in</Text>
+      </Pressable>
     </ScrollView>
   );
 }
@@ -46,30 +42,31 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#333333',
   },
   headerText: {
     padding: 40,
     fontSize: 30,
-    color: "#EDEFEE",
-    textAlign: "center",
+    color: '#EDEFEE',
+    textAlign: 'center',
   },
   regularText: {
     fontSize: 24,
     padding: 20,
     marginVertical: 8,
-    color: "#EDEFEE",
-    textAlign: "center",
+    color: '#EDEFEE',
+    textAlign: 'center',
   },
-  input: {
+  inputBox: {
     height: 40,
     margin: 12,
     borderWidth: 1,
     padding: 10,
     fontSize: 16,
-    borderColor: "#EDEFEE",
-    backgroundColor: "#EDEFEE",
+    borderColor: '#EDEFEE',
+    backgroundColor: '#EDEFEE',
   },
-  loginButton: {
+  button: {
     fontSize: 22,
     padding: 10,
     marginVertical: 8,
@@ -83,5 +80,6 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
     fontSize: 25,
-  }
+  },
 });
+
