@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   Text,
   View,
@@ -7,21 +7,21 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
-} from "react-native";
-import { Searchbar } from "react-native-paper";
-import debounce from "lodash.debounce";
+} from 'react-native';
+import { Searchbar } from 'react-native-paper';
+import debounce from 'lodash.debounce';
 import {
   createTable,
   getMenuItems,
   saveMenuItems,
   filterByQueryAndCategories,
-} from "./database";
-import Filters from "./components/Filters";
-import { getSectionListData, useUpdateEffect } from "./utils";
+} from './database';
+import Filters from './components/Filters';
+import { getSectionListData, useUpdateEffect } from './utils';
 
 const API_URL =
-  "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/menu-items-by-category.json";
-const sections = ["Appetizers", "Salads", "Beverages"];
+  'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/menu-items-by-category.json';
+const sections = ['Appetizers', 'Salads', 'Beverages'];
 
 const Item = ({ title, price }) => (
   <View style={styles.item}>
@@ -32,32 +32,27 @@ const Item = ({ title, price }) => (
 
 export default function App() {
   const [data, setData] = useState([]);
-  const [searchBarText, setSearchBarText] = useState("");
-  const [query, setQuery] = useState("");
+  const [searchBarText, setSearchBarText] = useState('');
+  const [query, setQuery] = useState('');
   const [filterSelections, setFilterSelections] = useState(
     sections.map(() => false)
   );
 
-  const fetchData = async () => {
+  const fetchData = async() => {
     // 1. Implement this function
-    try {
-      const response = await fetch(
-        "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/menu-items-by-category.json"
-      );
-      const json = await response.json();
-      const results = json.menu.map((value) => {
-        let val = value;
-        val.category = value.category.title;
-        return val;
-      });
-      return results;
-    } catch (error) {
-      console.error(error);
-    }
+    
     // Fetch the menu from the API_URL endpoint. You can visit the API_URL in your browser to inspect the data returned
     // The category field comes as an object with a property called "title". You just need to get the title value and set it under the key "category".
     // So the server response should be slighly transformed in this function (hint: map function) to flatten out each menu item in the array,
-  };
+    let response = await fetch(API_URL);
+    let json = await response.json();
+    let results = json.menu.map((value) => {
+      let val = value;
+      val.category = value.category.title;
+      return val;
+    });
+    return results;
+  }
 
   useEffect(() => {
     (async () => {
@@ -69,8 +64,8 @@ export default function App() {
         // and then stores it into a SQLite database.
         // After that, every application restart loads the menu from the database
         if (!menuItems.length) {
-          const menuItems = await fetchData();
-          saveMenuItems(menuItems);
+          menuItems = await fetchData();
+          await saveMenuItems(menuItems);
         }
 
         const sectionListData = getSectionListData(menuItems);
@@ -125,12 +120,12 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <Searchbar
         placeholder="Search"
-        placeholderTextColor="white"
+        placeholderTextColor="black"
         onChangeText={handleSearchChange}
         value={searchBarText}
         style={styles.searchBar}
-        iconColor="white"
-        inputStyle={{ color: "white" }}
+        iconColor="black"
+        inputStyle={{ color: 'black' }}
         elevation={0}
       />
       <Filters
@@ -157,31 +152,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: StatusBar.currentHeight,
-    backgroundColor: "#495E57",
+    backgroundColor: '#495E57',
   },
   sectionList: {
     paddingHorizontal: 16,
   },
   searchBar: {
     marginBottom: 24,
-    backgroundColor: "#495E57",
+    backgroundColor: '#eeeeee',
     shadowRadius: 0,
     shadowOpacity: 0,
+    marginHorizontal: 16,
+    borderRadius: 16
   },
   item: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
   },
   header: {
     fontSize: 24,
     paddingVertical: 8,
-    color: "#FBDABB",
-    backgroundColor: "#495E57",
+    color: '#FBDABB',
+    backgroundColor: '#495E57',
   },
   title: {
     fontSize: 20,
-    color: "white",
+    color: 'white',
   },
 });

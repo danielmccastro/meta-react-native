@@ -1,14 +1,14 @@
-import * as SQLite from "expo-sqlite";
-import { SECTION_LIST_MOCK_DATA } from "./utils";
+import * as SQLite from 'expo-sqlite';
+import { SECTION_LIST_MOCK_DATA } from './utils';
 
-const db = SQLite.openDatabase("little_lemon");
+const db = SQLite.openDatabase('little_lemon');
 
 export async function createTable() {
   return new Promise((resolve, reject) => {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          "create table if not exists menuitems (id integer primary key not null, uuid text, title text, price text, category text);"
+          'create table if not exists menuitems (id integer primary key not null, uuid text, title text, price text, category text);'
         );
       },
       reject,
@@ -20,37 +20,31 @@ export async function createTable() {
 export async function getMenuItems() {
   return new Promise((resolve) => {
     db.transaction((tx) => {
-      tx.executeSql("select * from menuitems", [], (_, { rows }) => {
+      tx.executeSql('select * from menuitems', [], (_, { rows }) => {
         resolve(rows._array);
+      }, (tx, error) => {
+        console.error(error);
       });
     });
   });
 }
 
-export function saveMenuItems(menuItems) {
-  db.transaction((tx) => {
-    // 2. Implement a single SQL statement to save all menu data in a table called menuitems.
-    // Check the createTable() function above to see all the different columns the table has
-    // Hint: You need a SQL statement to insert multiple rows at once.
-    tx.executeSql(
-      `INSERT INTO menu items (id,title,price,category) VALUES ${menuItems
-        .map((value) => "(?,?,?,?)")
-        .join(",")}`,
-      menuItems.flatMap((value) => [
-        value.id,
-        value.title,
-        value.price,
-        value.category,
-      ]),
-      (tx, results) => {
-        if (results.rowsAffected > 0) {
-          console.log("Insert sucess");
+export async function saveMenuItems(menuItems) {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      // 2. Implement a single SQL statement to save all menu data in a table called menuitems.
+      // Check the createTable() function above to see all the different columns the table has
+      // Hint: You need a SQL statement to insert multiple rows at once.
+      let sqlStatement = `INSERT INTO menuitems (id,title,price,category) VALUES ${menuItems.map((value) => "(?,?,?,?)").join(",")}`;
+      tx.executeSql(sqlStatement, menuItems.flatMap((value) => [value.id, value.title, value.price, value.category]), (tx, results) => {
+        if (results.rowsAffected > 0 ) {
+          console.log('Insert success');              
           resolve();
         } else {
           reject();
         }
-      }
-    );
+      });
+    });
   });
 }
 
@@ -75,21 +69,16 @@ export function saveMenuItems(menuItems) {
  *
  */
 export async function filterByQueryAndCategories(query, activeCategories) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     // resolve(SECTION_LIST_MOCK_DATA);
     db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM menuitems WHERE category IN (${activeCategories
-          .map((e) => `'${e}'`)
-          .join(",")}) AND title LIKE '%${query}%';`,
-        [],
-        (tx, results) => {
-          resolve(results.rows._array);
-        },
-        (tx, error) => {
-          console.log(error);
-        }
-      );
-    });
+      let sqlStatement = `SELECT * FROM menuitems WHERE category IN (${activeCategories.map(e => `'${e}'`).join(",")}) AND title LIKE '%${query}%';`;
+      console.log(sqlStatement);
+      tx.executeSql(sqlStatement, [], (tx, results) => {
+        resolve(results.rows._array);
+      }, (tx, error) => {
+        console.error(error);
+      });
+    })
   });
 }
