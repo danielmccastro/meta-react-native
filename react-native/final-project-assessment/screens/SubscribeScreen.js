@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   disabledButton: {
-    backgroundColor: 'grey',
+    backgroundColor: "grey",
     opacity: 0.5,
     paddingHorizontal: 110,
     paddingVertical: 8,
