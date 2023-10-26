@@ -35,10 +35,14 @@ export default function App({ navigation }) {
   return (
     <Profile options={{ headerShown: false }} />
 
-    /*  <NavigationContainer>
+   /*  <NavigationContainer>
       <Stack.Navigator>
         {isOnboardingCompleted ? (
-          <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
+          <Stack.Screen
+            name="Profile"
+            component={Profile}
+            options={{ headerShown: false }}
+          />
         ) : (
           <Stack.Screen
             name="Onboarding"
@@ -47,6 +51,6 @@ export default function App({ navigation }) {
           />
         )}
       </Stack.Navigator>
-        </NavigationContainer> */
+    </NavigationContainer> */
   );
 }
