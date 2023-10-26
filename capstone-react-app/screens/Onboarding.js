@@ -8,14 +8,26 @@ import {
   Pressable,
   Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { validateEmail } from "../utils";
 
-export default function Onboarding() {
+export default function Onboarding({ navigation }) {
   const [firstName, onChangeFirstName] = useState("");
   const [email, onChangeEmail] = useState("");
   const isEmailValid = validateEmail(email);
+
+  const setProfile = async (firstName, email) => {
+    const firstPair = ["firstName", JSON.stringify(firstName)];
+    const secondPair = ["email", JSON.stringify(email)];
+    try {
+      await AsyncStorage.multiSet([firstPair, secondPair]);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
-    <>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Image
           source={require("../assets/Logo.png")}
@@ -47,18 +59,19 @@ export default function Onboarding() {
             isEmailValid && firstName != "" ? styles.btn : styles.disabledBtn
           }
           onPress={() => {
-            Alert.alert("Do nothing");
+            setProfile(firstName, email)
           }}
           disabled={!isEmailValid || firstName == ""}
         >
           <Text style={styles.labelText}>Next</Text>
         </Pressable>
       </View>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1, marginTop: 30 },
   header: {
     alignItems: "center",
     justifyContent: "center",
