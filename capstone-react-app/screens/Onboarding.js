@@ -6,7 +6,7 @@ import {
   View,
   Image,
   Pressable,
-  Alert,
+  KeyboardAvoidingView
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { validateEmail } from "../utils";
@@ -27,46 +27,52 @@ export default function Onboarding({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          source={require("../assets/Logo.png")}
-          accessible={true}
-          accessibilityLabel={"Little Lemon Logo"}
-          style={styles.img}
-        />
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Image
+            source={require("../assets/Logo.png")}
+            accessible={true}
+            accessibilityLabel={"Little Lemon Logo"}
+            style={styles.img}
+          />
+        </View>
+        <View style={styles.content}>
+          <Text style={styles.headerText}>Let us get to know you</Text>
+          <Text style={styles.labelText}>First Name</Text>
+          <TextInput
+            style={styles.inputBox}
+            keyboardType="default"
+            textContentType="name"
+            onChangeText={onChangeFirstName}
+          />
+          <Text style={styles.labelText}>Email</Text>
+          <TextInput
+            style={styles.inputBox}
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            onChangeText={onChangeEmail}
+          />
+        </View>
+        <View style={styles.footer}>
+          <Pressable
+            style={
+              isEmailValid && firstName != "" ? styles.btn : styles.disabledBtn
+            }
+            onPress={() => {
+              setProfile(firstName, email);
+              console.log(firstName, email);
+            }}
+            disabled={!isEmailValid || firstName == ""}
+          >
+            <Text style={styles.labelText}>Next</Text>
+          </Pressable>
+        </View>
       </View>
-      <View style={styles.content}>
-        <Text style={styles.headerText}>Let us get to know you</Text>
-        <Text style={styles.labelText}>First Name</Text>
-        <TextInput
-          style={styles.inputBox}
-          keyboardType="default"
-          textContentType="name"
-          onChangeText={onChangeFirstName}
-        />
-        <Text style={styles.labelText}>Email</Text>
-        <TextInput
-          style={styles.inputBox}
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          onChangeText={onChangeEmail}
-        />
-      </View>
-      <View style={styles.footer}>
-        <Pressable
-          style={
-            isEmailValid && firstName != "" ? styles.btn : styles.disabledBtn
-          }
-          onPress={() => {
-            setProfile(firstName, email)
-          }}
-          disabled={!isEmailValid || firstName == ""}
-        >
-          <Text style={styles.labelText}>Next</Text>
-        </Pressable>
-      </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

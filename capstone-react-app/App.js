@@ -3,20 +3,24 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import OnboardingScreen from "./screens/Onboarding";
-import ProfileScreen from "./screens/Profile";
-import SplashScreen from "./screens/Splash";
+import Onboarding from "./screens/Onboarding";
+import Profile from "./screens/Profile";
+import Splash from "./screens/Splash";
+import { AccessibilityInfo } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
+export default function App({ navigation }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isOnboardingCompleted, setOnboardingCompleted] = useState(false);
 
   getItems = async () => {
     try {
       const values = await AsyncStorage.multiGet(["firstName", "email"]);
-      values ? setOnboardingCompleted == true : setOnboardingCompleted == false;
+      console.log(values);
+      values[0][1] != null && values[1][1] != null
+        ? setOnboardingCompleted(true)
+        : setOnboardingCompleted(false);
     } catch (e) {
       console.log(e);
     }
@@ -25,18 +29,24 @@ export default function App() {
   useEffect(() => {
     getItems();
     setIsLoading(false);
-  });
-  if (isLoading) return <SplashScreen />;
+  }, []);
 
+  if (isLoading) return <Splash />;
   return (
-    <NavigationContainer>
+    <Profile options={{ headerShown: false }} />
+
+    /*  <NavigationContainer>
       <Stack.Navigator>
         {isOnboardingCompleted ? (
-          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }}/>
         ) : (
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{headerShown: false}}/>
+          <Stack.Screen
+            name="Onboarding"
+            component={Onboarding}
+            options={{ headerShown: false }}
+          />
         )}
       </Stack.Navigator>
-    </NavigationContainer>
+        </NavigationContainer> */
   );
 }
