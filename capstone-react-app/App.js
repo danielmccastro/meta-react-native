@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -6,7 +6,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Onboarding from "./screens/Onboarding";
 import Profile from "./screens/Profile";
 import Splash from "./screens/Splash";
-import { AccessibilityInfo } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,9 +32,7 @@ export default function App({ navigation }) {
 
   if (isLoading) return <Splash />;
   return (
-    <Profile options={{ headerShown: false }} />
-
-   /*  <NavigationContainer>
+    <NavigationContainer>
       <Stack.Navigator>
         {isOnboardingCompleted ? (
           <Stack.Screen
@@ -51,6 +48,6 @@ export default function App({ navigation }) {
           />
         )}
       </Stack.Navigator>
-    </NavigationContainer> */
+    </NavigationContainer>
   );
 }

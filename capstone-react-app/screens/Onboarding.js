@@ -9,15 +9,18 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { validateEmail } from "../utils";
+import { validateEmail, validateFirstName } from "../utils";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Onboarding({ navigation }) {
+export default function Onboarding() {
+  const navigation = useNavigation();
   const [firstName, onChangeFirstName] = useState("");
   const [email, onChangeEmail] = useState("");
   const isEmailValid = validateEmail(email);
+  const isFirstNameValid = validateFirstName(firstName);
 
   const setProfile = async (firstName, email) => {
-    const firstPair = ["firstName", JSON.stringify(firstName)];
+    const firstPair = ["firstName", JSON.stringify(firstName)]; // modify this function to persist the object initialState data (isonboardingcompleted, firstName, email) instead of first and secondpairs
     const secondPair = ["email", JSON.stringify(email)];
     try {
       await AsyncStorage.multiSet([firstPair, secondPair]);
@@ -60,13 +63,13 @@ export default function Onboarding({ navigation }) {
         <View style={styles.footer}>
           <Pressable
             style={
-              isEmailValid && firstName != "" ? styles.btn : styles.disabledBtn
+              isEmailValid && isFirstNameValid ? styles.btn : styles.disabledBtn
             }
             onPress={() => {
               setProfile(firstName, email);
-              console.log(firstName, email);
+              navigation.replace("Profile");
             }}
-            disabled={!isEmailValid || firstName == ""}
+            disabled={!isEmailValid || !isFirstNameValid}
           >
             <Text style={styles.labelText}>Next</Text>
           </Pressable>
