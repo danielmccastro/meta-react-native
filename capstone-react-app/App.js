@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { NavigationContainer } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Onboarding from "./screens/Onboarding";
@@ -9,43 +9,41 @@ import Splash from "./screens/Splash";
 
 const Stack = createNativeStackNavigator();
 
-export default function App({ navigation }) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isOnboardingCompleted, setOnboardingCompleted] = useState(false);
-
-  getItems = async () => {
-    try {
-      const values = await AsyncStorage.multiGet(["firstName", "email"]);
-      console.log(values);
-      values[0][1] != null && values[1][1] != null
-        ? setOnboardingCompleted(true)
-        : setOnboardingCompleted(false);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+export default function App() {
+  const [state, setState] = useState({
+    isLoading: true,
+    isOnboardingCompleted: false,
+  });
 
   useEffect(() => {
-    getItems();
-    setIsLoading(false);
-  }, []);
+    const checkOnboardingStatus = async () => {
+      try {
+        const flag = await AsyncStorage.getItem("onboardingFlag");
+        setState({
+          isLoading: false,
+          isOnboardingCompleted: flag === "true",
+        });
+      } catch (error) {
+        setState({
+          isLoading: false,
+          isOnboardingCompleted: false,
+        });
+      }
+    };
 
-  if (isLoading) return <Splash />;
+    checkOnboardingStatus();
+  }, []);
+  if (state.isLoading) {
+    return <Splash />;
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {isOnboardingCompleted ? (
-          <Stack.Screen
-            name="Profile"
-            component={Profile}
-            options={{ headerShown: false }}
-          />
+        {state.isOnboardingCompleted ? (
+          <Stack.Screen name="Profile" component={Profile} />
         ) : (
-          <Stack.Screen
-            name="Onboarding"
-            component={Onboarding}
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="Onboarding" component={Onboarding} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

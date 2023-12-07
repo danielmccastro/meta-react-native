@@ -80,7 +80,7 @@ export default function Onboarding() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: 30 },
+  container: { flex: 1 },
   header: {
     alignItems: "center",
     justifyContent: "center",
@@ -93,11 +93,12 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     backgroundColor: "#495E57",
-    padding: 35,
+    padding: 30,
+    flex: 3,
   },
   headerText: {
     fontSize: 26,
-    paddingBottom: 175,
+    paddingBottom: 80,
     color: "white",
     marginTop: 50,
   },
@@ -117,6 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#EDEFEE",
   },
   footer: {
+    flex: 1,
     alignItems: "flex-end",
   },
   btn: {
