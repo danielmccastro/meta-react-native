@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,21 +11,28 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { validateEmail, validateFirstName } from "../utils";
 import { useNavigation } from "@react-navigation/native";
+import AppContext from "../context/AppContext";
 
 export default function Onboarding() {
   const navigation = useNavigation();
   const [firstName, onChangeFirstName] = useState("");
   const [email, onChangeEmail] = useState("");
+  const user = { firstName, email };
   const isEmailValid = validateEmail(email);
   const isFirstNameValid = validateFirstName(firstName);
+  const { setGlobalState, updateUser } = useContext(AppContext);
 
   const setProfile = async (firstName, email) => {
-    const firstPair = ["firstName", JSON.stringify(firstName)]; // modify this function to persist the object initialState data (isonboardingcompleted, firstName, email) instead of first and secondpairs
-    const secondPair = ["email", JSON.stringify(email)];
     try {
-      await AsyncStorage.multiSet([firstPair, secondPair]);
-    } catch (e) {
-      console.log(e);
+      await AsyncStorage.setItem("@user", JSON.stringify(user));
+      updateUser({ firstName, email });
+      setGlobalState({
+        isLoading: false,
+        isOnboardingCompleted: true,
+      });
+      navigation.navigate("Profile");
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -65,10 +72,7 @@ export default function Onboarding() {
             style={
               isEmailValid && isFirstNameValid ? styles.btn : styles.disabledBtn
             }
-            onPress={() => {
-              setProfile(firstName, email);
-              navigation.replace("Profile");
-            }}
+            onPress={() => setProfile(user)}
             disabled={!isEmailValid || !isFirstNameValid}
           >
             <Text style={styles.labelText}>Next</Text>
