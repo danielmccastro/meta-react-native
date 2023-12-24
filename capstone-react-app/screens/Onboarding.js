@@ -22,10 +22,11 @@ export default function Onboarding() {
   const isFirstNameValid = validateFirstName(firstName);
   const { setGlobalState, updateUser } = useContext(AppContext);
 
-  const setProfile = async (firstName, email) => {
+  const setProfile = async () => {
     try {
-      await AsyncStorage.setItem("@user", JSON.stringify(user));
-      updateUser({ firstName, email });
+      const userData = { firstName, email };
+      await AsyncStorage.setItem("@user", JSON.stringify(userData));
+      updateUser(userData);
       setGlobalState({
         isLoading: false,
         isOnboardingCompleted: true,
@@ -72,7 +73,7 @@ export default function Onboarding() {
             style={
               isEmailValid && isFirstNameValid ? styles.btn : styles.disabledBtn
             }
-            onPress={() => setProfile(user)}
+            onPress={() => setProfile(user) && console.log(user)}
             disabled={!isEmailValid || !isFirstNameValid}
           >
             <Text style={styles.labelText}>Next</Text>

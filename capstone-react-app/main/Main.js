@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
-import AppContext, { AppProvider } from "../context/AppContext";
+import AppContext from "../context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Onboarding from "../screens/Onboarding";

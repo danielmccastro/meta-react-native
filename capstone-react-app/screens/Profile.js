@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,6 +11,9 @@ import {
 } from "react-native";
 import Checkbox from "expo-checkbox";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import AppContext from "../context/AppContext";
+import { validateEmail, validateFirstName, validatePhoneNumber } from "../utils";
 
 const notificationPrefState = {
   orderStatus: true,
@@ -21,13 +24,15 @@ const notificationPrefState = {
 
 export default function Profile() {
   const [image, setImage] = useState(null);
-  const [firstName, setFirstName] = useState(null);
+  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState(null);
-  const [email, setEmail] = useState(null);
+  const [email, setEmail] = useState("");
   const [notificationPref, setNotificationPref] = useState(
     notificationPrefState
   );
+
+  const { userLogout, getUser } = useContext(AppContext);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -45,38 +50,35 @@ export default function Profile() {
   };
 
   const setProfileValues = async (userAsyncStorage) => {
-    const { firstName, email, lastName, phoneNumber, notificationPref } =
-      userAsyncStorage;
-    setFirstName(firstName);
-    setLastName(lastName || null);
-    setEmail(email);
-    setPhoneNumber(phoneNumber || null);
-    setNotificationPref(notificationPref || notificationPrefState);
+    try {
+      const user = JSON.parse(userAsyncStorage);
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+      setEmail(user.email || "");
+      setPhoneNumber(user.phoneNumber || "");
+      setNotificationPref(user.notificationPref || notificationPrefState);
+    } catch (error) {
+      console.log("Error setting profile values:", error);
+    }
   };
 
   const loadProfileData = async () => {
     try {
-      const jsonString = await AsyncStorage.getItem("user");
-      if (!jsonString) return;
-      await setProfileValues(JSON.parse(jsonString));
+      const jsonString = await AsyncStorage.getItem("@user");
+      console.log("Retrieved JSON string:", jsonString);
+      if (!jsonString) {
+        console.log("No data retrieved from AsyncStorage");
+        return;
+      }
+      console.log("Data retrieved from AsyncStorage:", jsonString);
+      await setProfileValues(jsonString);
     } catch (error) {
       console.log("Error loading profile data:", error);
-      return;
     }
   };
 
-  const pickFirstLetter = (firstName, lastName) => {
-    const avatarText = "";
-    firstName && lastName !== null
-      ? (avatarText = firstName.charAt(0) + lastName.charAt(0))
-      : null;
-    console.log(avatarText);
-    return avatarText;
-  };
-
   useEffect(() => {
-    pickFirstLetter(firstName, lastName);
-    console.log(avatarText);
+    loadProfileData();
   }, []);
 
   const updateNotificationPref = (key, value) => {
@@ -104,7 +106,8 @@ export default function Profile() {
             style={styles.inputBox}
             keyboardType="default"
             textContentType="none"
-            /* value={} get from asyncstorage*/
+            value={firstName}
+            onChangeText={(text) => setFirstName(text)}
           />
           <Text style={styles.labelText}>Last Name</Text>
           <TextInput
@@ -117,7 +120,8 @@ export default function Profile() {
             style={styles.inputBox}
             keyboardType="default"
             textContentType="none"
-            /* value={} get from asyncstorage*/
+            value={email}
+            onChangeText={(text) => setEmail(text)}
           />
           <Text style={styles.labelText}>Phone number</Text>
           <TextInput
@@ -164,7 +168,7 @@ export default function Profile() {
             />
             <Text style={styles.notificationText}>Newsletter</Text>
           </View>
-          <Pressable style={styles.logoutBtn}>
+          <Pressable style={styles.logoutBtn} onPress={() => userLogout()}>
             <Text style={styles.logoutText}>Log out</Text>
           </Pressable>
           <View style={styles.btnContainer}>
@@ -182,7 +186,7 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: 30 },
+  container: { flex: 1 },
   header: {
     alignItems: "center",
     justifyContent: "center",

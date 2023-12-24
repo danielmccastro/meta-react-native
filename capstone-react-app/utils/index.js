@@ -7,3 +7,7 @@ export const validateEmail = (email) => {
 export const validateFirstName = (firstName) => {
   return firstName.match(/^[a-z ,.'-]+$/i);
 };
+
+export const validatePhoneNumber = (phoneNumber) => {
+  return phoneNumber.match(/^(\+1)?[0-9]{3}[\s.-]?[0-9]{3}[\s.-]?[0-9]{4}$/);
+};
