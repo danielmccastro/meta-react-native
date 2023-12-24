@@ -16,6 +16,7 @@ import AppContext from "../context/AppContext";
 export default function Onboarding() {
   const navigation = useNavigation();
   const [firstName, onChangeFirstName] = useState("");
+  const [lastName, onChangeLastName] = useState("");
   const [email, onChangeEmail] = useState("");
   const user = { firstName, email };
   const isEmailValid = validateEmail(email);
@@ -24,7 +25,7 @@ export default function Onboarding() {
 
   const setProfile = async () => {
     try {
-      const userData = { firstName, email };
+      const userData = { firstName, lastName, email };
       await AsyncStorage.setItem("@user", JSON.stringify(userData));
       updateUser(userData);
       setGlobalState({
@@ -59,6 +60,13 @@ export default function Onboarding() {
             keyboardType="default"
             textContentType="name"
             onChangeText={onChangeFirstName}
+          />
+          <Text style={styles.labelText}>Last Name</Text>
+          <TextInput
+            style={styles.inputBox}
+            keyboardType="default"
+            textContentType="name"
+            onChangeText={onChangeLastName}
           />
           <Text style={styles.labelText}>Email</Text>
           <TextInput

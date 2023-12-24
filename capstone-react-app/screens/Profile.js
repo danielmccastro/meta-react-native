@@ -11,9 +11,15 @@ import {
 } from "react-native";
 import Checkbox from "expo-checkbox";
 import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AppContext from "../context/AppContext";
-import { validateEmail, validateFirstName, validatePhoneNumber } from "../utils";
+import { useNavigation } from "@react-navigation/native";
+import {
+  validateEmail,
+  validateFirstName,
+  validatePhoneNumber,
+} from "../utils";
 
 const notificationPrefState = {
   orderStatus: true,
@@ -23,30 +29,38 @@ const notificationPrefState = {
 };
 
 export default function Profile() {
+  const navigation = useNavigation();
   const [image, setImage] = useState(null);
   const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState(null);
+  const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState(null);
   const [email, setEmail] = useState("");
   const [notificationPref, setNotificationPref] = useState(
     notificationPrefState
   );
 
-  const { userLogout, getUser } = useContext(AppContext);
+  const { userLogout, updateUser } = useContext(AppContext);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [4, 4],
       quality: 1,
     });
-
-    console.log(result);
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+
+  const getInitials = (firstName, lastName) => {
+    const firstNameChars = [...firstName];
+    const lastNameChars = [...lastName];
+
+    const initials = firstNameChars[0] + lastNameChars[0];
+
+    return initials;
   };
 
   const setProfileValues = async (userAsyncStorage) => {
@@ -77,13 +91,39 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
+  const saveProfileChanges = async () => {
+    if (!validatePhoneNumber(phoneNumber)) {
+      alert("Invalid phone number format.");
+      return;
+    }
+    try {
+      updateUser({
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        notificationPref,
+      });
+      navigation.replace("Home");
+    } catch (error) {
+      alert("An error has occured.");
+      console.log(error);
+    }
+  };
+
+  const discardProfileChanges = async () => {
     loadProfileData();
-  }, []);
+    alert("All changes have been discarded.");
+  };
 
   const updateNotificationPref = (key, value) => {
     setNotificationPref((prev) => ({ ...prev, [key]: value }));
   };
+
+  useEffect(() => {
+    loadProfileData();
+  }, []);
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -91,12 +131,28 @@ export default function Profile() {
     >
       <ScrollView style={styles.container}>
         <View style={styles.header}>
+          <Pressable
+            onPress={() => console.log("Pressed")}
+            style={styles.returnButton}
+          >
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </Pressable>
           <Image
             source={require("../assets/Logo.png")}
             accessible={true}
             accessibilityLabel={"Little Lemon Logo"}
             style={styles.img}
           />
+          <Pressable onPress={pickImage} style={styles.returnButton}>
+            {image ? (
+              <Image
+                source={{ uri: image }}
+                style={styles.profileImg}
+              />
+            ) : (
+              <Text>{getInitials(firstName, lastName)}</Text>
+            )}
+          </Pressable>
         </View>
         <View style={styles.content}>
           <Text style={styles.headerText}>Personal information</Text>
@@ -114,6 +170,8 @@ export default function Profile() {
             style={styles.inputBox}
             keyboardType="default"
             textContentType="none"
+            value={lastName}
+            onChangeText={(text) => setLastName(text)}
           />
           <Text style={styles.labelText}>Email</Text>
           <TextInput
@@ -128,11 +186,13 @@ export default function Profile() {
             style={styles.inputBox}
             keyboardType="default"
             textContentType="none"
+            value={phoneNumber}
+            onChangeText={(text) => setPhoneNumber(text)}
           />
           <Text style={styles.headerText}>Email notifications</Text>
           <View style={styles.checkboxContainer}>
             <Checkbox
-              value={notificationPrefState.orderStatus}
+              value={notificationPref.orderStatus}
               onValueChange={(value) =>
                 updateNotificationPref("orderStatus", value)
               }
@@ -142,7 +202,7 @@ export default function Profile() {
           </View>
           <View style={styles.checkboxContainer}>
             <Checkbox
-              value={notificationPrefState.password}
+              value={notificationPref.password}
               onValueChange={(value) =>
                 updateNotificationPref("password", value)
               }
@@ -152,7 +212,7 @@ export default function Profile() {
           </View>
           <View style={styles.checkboxContainer}>
             <Checkbox
-              value={notificationPrefState.offers}
+              value={notificationPref.offers}
               onValueChange={(value) => updateNotificationPref("offers", value)}
               style={styles.checkbox}
             />
@@ -160,7 +220,7 @@ export default function Profile() {
           </View>
           <View style={styles.checkboxContainer}>
             <Checkbox
-              value={notificationPrefState.newsletter}
+              value={notificationPref.newsletter}
               onValueChange={(value) =>
                 updateNotificationPref("newsletter", value)
               }
@@ -172,10 +232,13 @@ export default function Profile() {
             <Text style={styles.logoutText}>Log out</Text>
           </Pressable>
           <View style={styles.btnContainer}>
-            <Pressable style={styles.changesBtn}>
+            <Pressable
+              style={styles.changesBtn}
+              onPress={discardProfileChanges}
+            >
               <Text style={styles.changesText}>Discard changes</Text>
             </Pressable>
-            <Pressable style={styles.changesBtn}>
+            <Pressable style={styles.changesBtn} onPress={saveProfileChanges}>
               <Text style={styles.changesText}>Save changes</Text>
             </Pressable>
           </View>
@@ -188,13 +251,29 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+    marginLeft: 15,
+    marginRight: 15,
+  },
+  returnButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "lightgrey",
     justifyContent: "center",
+    alignItems: "center",
   },
   img: {
     paddingVertical: 35,
     resizeMode: "contain",
   },
+  profileImg: {
+    height: 50,
+    width:  50,
+    borderRadius: 100
+    },
   avatar: {
     height: 50,
     backgroundColor: "black",
