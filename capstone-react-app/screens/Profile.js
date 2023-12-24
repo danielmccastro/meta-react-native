@@ -51,7 +51,12 @@ export default function Profile() {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      updateUser({ image: image });
     }
+  };
+
+  const clearImage = async () => {
+    setImage(null);
   };
 
   const getInitials = (firstName, lastName) => {
@@ -71,6 +76,7 @@ export default function Profile() {
       setEmail(user.email || "");
       setPhoneNumber(user.phoneNumber || "");
       setNotificationPref(user.notificationPref || notificationPrefState);
+      setImage(user.image || null);
     } catch (error) {
       console.log("Error setting profile values:", error);
     }
@@ -103,6 +109,7 @@ export default function Profile() {
         email,
         phoneNumber,
         notificationPref,
+        image,
       });
       navigation.replace("Home");
     } catch (error) {
@@ -145,10 +152,7 @@ export default function Profile() {
           />
           <Pressable onPress={pickImage} style={styles.returnButton}>
             {image ? (
-              <Image
-                source={{ uri: image }}
-                style={styles.profileImg}
-              />
+              <Image source={{ uri: image }} style={styles.profileImg} />
             ) : (
               <Text>{getInitials(firstName, lastName)}</Text>
             )}
@@ -156,7 +160,25 @@ export default function Profile() {
         </View>
         <View style={styles.content}>
           <Text style={styles.headerText}>Personal information</Text>
+
           <Text style={styles.labelText}>Avatar</Text>
+          <View style={styles.avatarSection}>
+            <Pressable onPress={pickImage} style={styles.avatarBtn}>
+              {image ? (
+                <Image source={{ uri: image }} style={styles.profileImg} />
+              ) : (
+                <Text>{getInitials(firstName, lastName)}</Text>
+              )}
+            </Pressable>
+
+            <Pressable style={styles.changeImageBtn} onPress={pickImage}>
+              <Text style={styles.changesText}>Change</Text>
+            </Pressable>
+            <Pressable style={styles.removeImageBtn} onPress={clearImage}>
+              <Text style={styles.changesText}>Remove</Text>
+            </Pressable>
+          </View>
+
           <Text style={styles.labelText}>First Name</Text>
           <TextInput
             style={styles.inputBox}
@@ -271,17 +293,36 @@ const styles = StyleSheet.create({
   },
   profileImg: {
     height: 50,
-    width:  50,
-    borderRadius: 100
-    },
-  avatar: {
-    height: 50,
-    backgroundColor: "black",
+    width: 50,
+    borderRadius: 100,
   },
-  avatarText: {
-    color: "black",
-    fontSize: 15,
-    fontWeight: "bold",
+  avatarSection: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+  },
+  avatarBtn: {
+    display: "flex",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "lightgrey",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  changeImageBtn: {
+    backgroundColor: "#495E57",
+    margin: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "black",
+  },
+  removeImageBtn: {
+    backgroundColor: "#FF7276",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#495E57",
   },
   content: {
     flex: 1,
