@@ -44,8 +44,8 @@ export default function App() {
       <Stack.Navigator>
         {globalState.isOnboardingCompleted ? (
           <>
-            <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Profile" component={Profile} />
           </>
         ) : (
           <Stack.Screen name="Onboarding" component={Onboarding} />

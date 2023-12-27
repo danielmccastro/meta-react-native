@@ -102,6 +102,14 @@ export default function Profile() {
       alert("Invalid phone number format.");
       return;
     }
+    if (!validateEmail(email)) {
+      alert("Invalid email format.");
+      return;
+    }
+    if (!validateFirstName(firstName)) {
+      alert("Invalid name format.");
+      return;
+    }
     try {
       updateUser({
         firstName,
@@ -139,7 +147,7 @@ export default function Profile() {
       <ScrollView style={styles.container}>
         <View style={styles.header}>
           <Pressable
-            onPress={() => console.log("Pressed")}
+            onPress={() => navigation.navigate("Home")}
             style={styles.returnButton}
           >
             <Ionicons name="arrow-back" size={24} color="black" />

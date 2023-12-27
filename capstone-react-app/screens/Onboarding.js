@@ -107,13 +107,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#495E57",
     padding: 30,
-    flex: 3,
   },
   headerText: {
     fontSize: 26,
-    paddingBottom: 80,
+    paddingBottom: 25,
     color: "white",
-    marginTop: 50,
+    marginTop: 10,
   },
   labelText: {
     textAlign: "center",

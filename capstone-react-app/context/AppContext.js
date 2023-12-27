@@ -24,6 +24,7 @@ export const AppProvider = ({ children }) => {
     if (user) {
       user = JSON.parse(user);
     }
+    console.log(user)
     return user;
   };
 
