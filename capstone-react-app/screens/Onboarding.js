@@ -6,7 +6,6 @@ import {
   View,
   Image,
   Pressable,
-  KeyboardAvoidingView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { validateEmail, validateFirstName } from "../utils";
@@ -39,10 +38,7 @@ export default function Onboarding() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+    <View style={styles.container}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Image
@@ -88,7 +84,7 @@ export default function Onboarding() {
           </Pressable>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -97,6 +93,10 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     justifyContent: "center",
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 45,
+    paddingBottom: 15,
   },
   img: {
     paddingVertical: 35,

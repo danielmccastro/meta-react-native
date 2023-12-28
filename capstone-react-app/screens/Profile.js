@@ -20,6 +20,7 @@ import {
   validateFirstName,
   validatePhoneNumber,
 } from "../utils";
+import { removeDatabase } from "../db/database";
 
 const notificationPrefState = {
   orderStatus: true,
@@ -140,32 +141,29 @@ export default function Profile() {
   }, []);
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Pressable
+          onPress={() => navigation.navigate("Home")}
+          style={styles.returnButton}
+        >
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </Pressable>
+        <Image
+          source={require("../assets/Logo.png")}
+          accessible={true}
+          accessibilityLabel={"Little Lemon Logo"}
+          style={styles.img}
+        />
+        <Pressable onPress={pickImage} style={styles.returnButton}>
+          {image ? (
+            <Image source={{ uri: image }} style={styles.profileImg} />
+          ) : (
+            <Text>{getInitials(firstName, lastName)}</Text>
+          )}
+        </Pressable>
+      </View>
       <ScrollView style={styles.container}>
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => navigation.navigate("Home")}
-            style={styles.returnButton}
-          >
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </Pressable>
-          <Image
-            source={require("../assets/Logo.png")}
-            accessible={true}
-            accessibilityLabel={"Little Lemon Logo"}
-            style={styles.img}
-          />
-          <Pressable onPress={pickImage} style={styles.returnButton}>
-            {image ? (
-              <Image source={{ uri: image }} style={styles.profileImg} />
-            ) : (
-              <Text>{getInitials(firstName, lastName)}</Text>
-            )}
-          </Pressable>
-        </View>
         <View style={styles.content}>
           <Text style={styles.headerText}>Personal information</Text>
 
@@ -258,7 +256,10 @@ export default function Profile() {
             />
             <Text style={styles.notificationText}>Newsletter</Text>
           </View>
-          <Pressable style={styles.logoutBtn} onPress={() => userLogout()}>
+          <Pressable
+            style={styles.logoutBtn}
+            onPress={() => userLogout() && removeDatabase()}
+          >
             <Text style={styles.logoutText}>Log out</Text>
           </Pressable>
           <View style={styles.btnContainer}>
@@ -274,7 +275,7 @@ export default function Profile() {
           </View>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -284,8 +285,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginLeft: 15,
-    marginRight: 15,
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 45,
+    paddingBottom: 15,
   },
   returnButton: {
     width: 50,
@@ -296,7 +299,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   img: {
-    paddingVertical: 35,
     resizeMode: "contain",
   },
   profileImg: {

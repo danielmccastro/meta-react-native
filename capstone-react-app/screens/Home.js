@@ -1,76 +1,79 @@
 import React, { useEffect, useContext, useState } from "react";
 import {
-  KeyboardAvoidingView,
   Text,
   View,
   ScrollView,
   Image,
   Pressable,
-  FlatList
+  FlatList,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StyleSheet } from "react-native";
-import AppContext from "../context/AppContext";
+import { checkMenu } from "../db/database";
 
 export default function Home() {
   const navigation = useNavigation();
 
   const [menuItems, setMenuItems] = useState([]);
 
-  const getMenu = async () => {
+  const loadData = async () => {
     try {
-      const response = await fetch(
-        "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json"
-      );
-      const json = await response.json();
-      setData(json.menu);
+      const menuItems = await checkMenu();
+      return setMenuItems(menuItems);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    getMenu();
-    console.log(data);
+    loadData();
+    console.log(menuItems);
   }, []);
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView style={styles.container}>
-        <View style={styles.header}>
-          <Image
-            source={require("../assets/Logo.png")}
-            accessible={true}
-            accessibilityLabel={"Little Lemon Logo"}
-            style={styles.imgLogo}
-          />
-          <Pressable
-            onPress={() => {
-              navigation.navigate("Profile");
-            }}
-            style={styles.avatarButton}
-          >
-            <Text>{"DC"}</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-      <View>
-        <FlatList
-          data={data}
-          keyExtractor={({ item, index }) => item + index}
-          renderItem={({ item }) => (
-            <View>
-              <Text>{item.name}</Text>
-              <Text>{item.description}</Text>
-              <Text>{item.price}</Text>
-            </View>
-          )}
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Image
+          source={require("../assets/Logo.png")}
+          accessible={true}
+          accessibilityLabel={"Little Lemon Logo"}
+          style={styles.imgLogo}
         />
+        <Pressable
+          onPress={() => {
+            navigation.navigate("Profile");
+          }}
+          style={styles.avatarButton}
+        >
+          <Text>{"DC"}</Text>
+        </Pressable>
       </View>
-    </KeyboardAvoidingView>
+      <FlatList
+        data={menuItems}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.menuItems}>
+            <View style={styles.menuInfo}>
+              <Text style={styles.menuTitle}>{item.name}</Text>
+              <Text style={styles.menuPrice}>{"$" + item.price}</Text>
+              <Text style={styles.menuDescription}>{item.description}</Text>
+            </View>
+            <View>
+              <Image source={{ uri: item.image }} style={styles.imgDish} />
+            </View>
+          </View>
+        )}
+        ItemSeparatorComponent={() => (
+          <View
+            style={{
+              height: 1,
+              width: "100%",
+              backgroundColor: "lightgray", // Separator color
+            }}
+          />
+        )}
+      />
+    </View>
   );
 }
 
@@ -80,6 +83,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 45,
+    paddingBottom: 15,
   },
   avatarButton: {
     width: 50,
@@ -90,9 +97,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     right: 15,
+    top: 40,
   },
   imgLogo: {
-    paddingVertical: 35,
     resizeMode: "contain",
     justifyContent: "center",
   },
@@ -100,5 +107,29 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     borderRadius: 100,
+  },
+  menuItems: {
+    padding: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  menuInfo: { flex: 1 },
+  imgDish: {
+    resizeMode: "cover",
+    width: 120,
+    height: 120,
+    margin: 10,
+  },
+  menuTitle: {
+    fontWeight: "bold",
+    fontSize: 20,
+  },
+  menuDescription: {
+    color: "gray",
+  },
+  menuPrice: {
+    color: "gray",
+    fontWeight: "bold",
   },
 });

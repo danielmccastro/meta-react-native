@@ -44,11 +44,14 @@ export default function App() {
       <Stack.Navigator>
         {globalState.isOnboardingCompleted ? (
           <>
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="Home" component={Home} 
+            options={{headerShown: false}}/>
+            <Stack.Screen name="Profile" component={Profile} 
+            options={{headerShown: false}}/>
           </>
         ) : (
-          <Stack.Screen name="Onboarding" component={Onboarding} />
+          <Stack.Screen name="Onboarding" component={Onboarding} 
+          options={{headerShown: false}}/>
         )}
       </Stack.Navigator>
     </NavigationContainer>
