@@ -120,7 +120,12 @@ export default function Profile() {
         notificationPref,
         image,
       });
-      navigation.replace("Home");
+      navigation.replace("Home", {
+        userImage: image,
+        firstName: firstName,
+        lastName: lastName,
+        userInitials: getInitials(firstName, lastName),
+      });
     } catch (error) {
       alert("An error has occured.");
       console.log(error);

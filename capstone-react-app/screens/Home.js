@@ -6,12 +6,15 @@ import {
   Image,
   Pressable,
   FlatList,
+  SafeAreaView,
   Alert,
   SectionList,
 } from "react-native";
 import Filters from "../components/Filters";
 import { useNavigation } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import { StyleSheet } from "react-native";
+import { Searchbar } from "react-native-paper";
 import {
   createTable,
   getMenuItems,
@@ -27,6 +30,7 @@ const sections = ["starters", "mains", "desserts"];
 
 export default function Home() {
   const navigation = useNavigation();
+  const route = useRoute();
 
   const [data, setData] = useState([]);
   const [searchBarText, setSearchBarText] = useState("");
@@ -34,6 +38,15 @@ export default function Home() {
   const [filterSelections, setFilterSelections] = useState(
     sections.map(() => false)
   );
+
+  const getInitials = (firstName, lastName) => {
+    const firstNameChars = [...firstName];
+    const lastNameChars = [...lastName];
+
+    const initials = firstNameChars[0] + lastNameChars[0];
+
+    return initials;
+  };
 
   useEffect(() => {
     (async () => {
@@ -104,7 +117,7 @@ export default function Home() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Image
           source={require("../assets/Logo.png")}
@@ -118,11 +131,43 @@ export default function Home() {
           }}
           style={styles.avatarButton}
         >
-          <Text>{"DC"}</Text>
+          {route.params && route.params.userImage ? (
+            <Image
+              source={{ uri: route.params.userImage }}
+              style={styles.imgProfile}
+            />
+          ) : (
+            <Text style={styles.initialsText}>{null}</Text>
+          )}
         </Pressable>
       </View>
 
-      <View>
+      <View style={styles.heroSection}>
+        <Text style={styles.heroTitle}>Little Lemon</Text>
+        <Text style={styles.heroSubtitle}>Chicago</Text>
+        <View style={styles.heroImgContainer}>
+          <Text style={styles.heroDescription}>
+            We are a family owned Mediterranean restaurant, focused on
+            traditional recipes served with a modern twist.
+          </Text>
+          <Image
+            source={require("../assets/Hero.png")}
+            style={styles.imgHero}
+          />
+        </View>
+        <Searchbar
+          placeholder="Search"
+          placeholderTextColor="black"
+          onChangeText={handleSearchChange}
+          value={searchBarText}
+          style={styles.searchBar}
+          iconColor="black"
+          inputStyle={{ color: "black" }}
+          elevation={0}
+        />
+      </View>
+
+      <View style={styles.container}>
         <Text style={styles.orderTxt}>ORDER FOR DELIVERY!</Text>
 
         <Filters
@@ -130,41 +175,56 @@ export default function Home() {
           onChange={handleFiltersChange}
           sections={sections}
         />
-
-        <SectionList
-          style={styles.sectionList}
-          sections={data}
-          keyExtractor={(item, index) => item.id || index}
-          renderItem={({ item }) => (
-            <View style={styles.menuInfo}>
-              <Text style={styles.menuTitle}>{item.name}</Text>
-              <Text style={styles.menuPrice}>${item.price}</Text>
-              <Text style={styles.menuDescription}>{item.description}</Text>
-              <Image
-                style={styles.imgDish}
-                source={{
-                  uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
+        <ScrollView style={styles.sectionList}>
+          {data.map((section) => (
+            <View key={section.name}>
+              <Text style={styles.sectionHeader}>
+                {section.name.toUpperCase()}
+              </Text>
+              {section.data.map((item, index) => (
+                <View key={index} style={styles.item}>
+                  <View style={styles.menuInfo}>
+                    <Text style={styles.menuTitle}>{item.name}</Text>
+                    <Text style={styles.menuPrice}>${item.price}</Text>
+                    <Text style={styles.menuDescription}>
+                      {item.description}
+                    </Text>
+                  </View>
+                  <Image
+                    style={styles.imgDish}
+                    source={{
+                      uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
+                    }}
+                  />
+                </View>
+              ))}
+              <View
+                style={{
+                  height: 0.5,
+                  width: "90%",
+                  backgroundColor: "grey",
+                  alignSelf: "center",
                 }}
               />
             </View>
-          )}
-          ItemSeparatorComponent={() => (
-            <View
-              style={{
-                height: 0.5,
-                width: "90%",
-                backgroundColor: "grey",
-                alignSelf: "center",
-              }}
-            />
-          )}
-        />
+          ))}
+        </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingTop: 45,
+    paddingBottom: 15,
+  },
   sectionList: {
     paddingHorizontal: 12,
   },
@@ -186,16 +246,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
     textAlign: "center",
-  },
-  container: { flex: 1 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingTop: 45,
-    paddingBottom: 15,
   },
   avatarButton: {
     width: 50,
@@ -240,15 +290,40 @@ const styles = StyleSheet.create({
     color: "gray",
     fontWeight: "bold",
   },
-  filterScrollView: { marginTop: 20, display: "flex" },
-  filterButton: {
-    color: "black",
-    borderRadius: 10,
-    marginRight: 12,
+  heroSection: {
+    backgroundColor: "#495E57",
+    padding: 20,
+    position: "relative",
+    overflow: "hidden",
   },
-  filterButtonText: {
-    padding: 10,
-    fontWeight: "bold",
-    textAlign: "center",
+  heroTitle: {
+    fontSize: 60,
+    color: "#F4CE14",
+    marginTop: -20,
+  },
+  heroSubtitle: {
+    fontSize: 40,
+    color: "#EDEFEE",
+    marginTop: -20,
+  },
+  heroImgContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  heroDescription: {
+    fontSize: 15,
+    color: "#EDEFEE",
+    maxWidth: 200,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  imgHero: {
+    height: 140,
+    width: 120,
+    marginTop: -30,
+    borderRadius: 20,
+  },
+  searchBar: {
+    marginTop: 20,
   },
 });

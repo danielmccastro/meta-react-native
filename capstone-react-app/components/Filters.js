@@ -18,6 +18,8 @@ const Filters = ({ onChange, selections, sections }) => {
             borderColor: "white",
             flex: 1,
             backgroundColor: selections[index] ? "#495E57" : "gray",
+            marginHorizontal: 15,
+            marginTop: 20,
           }}
         >
           <View>
