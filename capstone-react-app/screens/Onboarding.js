@@ -6,6 +6,8 @@ import {
   View,
   Image,
   Pressable,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { validateEmail, validateFirstName } from "../utils";
@@ -21,6 +23,10 @@ export default function Onboarding() {
   const isEmailValid = validateEmail(email);
   const isFirstNameValid = validateFirstName(firstName);
   const { setGlobalState, updateUser } = useContext(AppContext);
+
+  const hideKeyboard = () => {
+    Keyboard.dismiss();
+  };
 
   const setProfile = async () => {
     try {
@@ -38,53 +44,57 @@ export default function Onboarding() {
   };
 
   return (
-    <View style={styles.container}>
+    <TouchableWithoutFeedback onPress={hideKeyboard}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Image
-            source={require("../assets/Logo.png")}
-            accessible={true}
-            accessibilityLabel={"Little Lemon Logo"}
-            style={styles.img}
-          />
-        </View>
-        <View style={styles.content}>
-          <Text style={styles.headerText}>Let us get to know you</Text>
-          <Text style={styles.labelText}>First Name</Text>
-          <TextInput
-            style={styles.inputBox}
-            keyboardType="default"
-            textContentType="name"
-            onChangeText={onChangeFirstName}
-          />
-          <Text style={styles.labelText}>Last Name</Text>
-          <TextInput
-            style={styles.inputBox}
-            keyboardType="default"
-            textContentType="name"
-            onChangeText={onChangeLastName}
-          />
-          <Text style={styles.labelText}>Email</Text>
-          <TextInput
-            style={styles.inputBox}
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            onChangeText={onChangeEmail}
-          />
-        </View>
-        <View style={styles.footer}>
-          <Pressable
-            style={
-              isEmailValid && isFirstNameValid ? styles.btn : styles.disabledBtn
-            }
-            onPress={() => setProfile(user) && console.log(user)}
-            disabled={!isEmailValid || !isFirstNameValid}
-          >
-            <Text style={styles.labelText}>Next</Text>
-          </Pressable>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Image
+              source={require("../assets/Logo.png")}
+              accessible={true}
+              accessibilityLabel={"Little Lemon Logo"}
+              style={styles.img}
+            />
+          </View>
+          <View style={styles.content}>
+            <Text style={styles.headerText}>Let us get to know you</Text>
+            <Text style={styles.labelText}>First Name</Text>
+            <TextInput
+              style={styles.inputBox}
+              keyboardType="default"
+              textContentType="name"
+              onChangeText={onChangeFirstName}
+            />
+            <Text style={styles.labelText}>Last Name</Text>
+            <TextInput
+              style={styles.inputBox}
+              keyboardType="default"
+              textContentType="name"
+              onChangeText={onChangeLastName}
+            />
+            <Text style={styles.labelText}>Email</Text>
+            <TextInput
+              style={styles.inputBox}
+              keyboardType="email-address"
+              textContentType="emailAddress"
+              onChangeText={onChangeEmail}
+            />
+          </View>
+          <View style={styles.footer}>
+            <Pressable
+              style={
+                isEmailValid && isFirstNameValid
+                  ? styles.btn
+                  : styles.disabledBtn
+              }
+              onPress={() => setProfile(user) && console.log(user)}
+              disabled={!isEmailValid || !isFirstNameValid}
+            >
+              <Text style={styles.labelText}>Next</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -109,15 +119,17 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   headerText: {
-    fontSize: 26,
+    fontSize: 30,
     paddingBottom: 25,
     color: "white",
     marginTop: 10,
+    fontFamily: "Karla",
   },
   labelText: {
     textAlign: "center",
     fontSize: 22,
     color: "white",
+    fontFamily: "Karla",
   },
   inputBox: {
     height: 50,

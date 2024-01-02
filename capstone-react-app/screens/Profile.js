@@ -168,7 +168,7 @@ export default function Profile() {
           )}
         </Pressable>
       </View>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} keyboardDismissMode={"on-drag"}>
         <View style={styles.content}>
           <Text style={styles.headerText}>Personal information</Text>
 
@@ -350,6 +350,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     margin: 10,
+    fontFamily: "Markazi",
   },
   labelText: {
     marginTop: 10,

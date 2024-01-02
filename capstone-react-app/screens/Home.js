@@ -21,6 +21,7 @@ import {
   saveMenuItems,
   filterByQueryAndCategories,
 } from "../db/database";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSectionListData, useUpdateEffect } from "../utils";
 import debounce from "lodash.debounce";
 
@@ -39,6 +40,10 @@ export default function Home() {
     sections.map(() => false)
   );
 
+  const [image, setImage] = useState(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
   const getInitials = (firstName, lastName) => {
     const firstNameChars = [...firstName];
     const lastNameChars = [...lastName];
@@ -46,6 +51,32 @@ export default function Home() {
     const initials = firstNameChars[0] + lastNameChars[0];
 
     return initials;
+  };
+
+  const setProfileValues = async (userAsyncStorage) => {
+    try {
+      const user = JSON.parse(userAsyncStorage);
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+      setImage(user.image || null);
+    } catch (error) {
+      console.log("Error setting profile values:", error);
+    }
+  };
+
+  const loadProfileData = async () => {
+    try {
+      const jsonString = await AsyncStorage.getItem("@user");
+      console.log("Retrieved JSON string:", jsonString);
+      if (!jsonString) {
+        console.log("No data retrieved from AsyncStorage");
+        return;
+      }
+      console.log("Data retrieved from AsyncStorage:", jsonString);
+      await setProfileValues(jsonString);
+    } catch (error) {
+      console.log("Error loading profile data:", error);
+    }
   };
 
   useEffect(() => {
@@ -118,6 +149,7 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* HEADER */}
       <View style={styles.header}>
         <Image
           source={require("../assets/Logo.png")}
@@ -131,85 +163,98 @@ export default function Home() {
           }}
           style={styles.avatarButton}
         >
-          {route.params && route.params.userImage ? (
-            <Image
-              source={{ uri: route.params.userImage }}
-              style={styles.imgProfile}
-            />
+          {loadProfileData() && image ? (
+            <Image source={{ uri: image }} style={styles.imgProfile} />
           ) : (
-            <Text style={styles.initialsText}>{null}</Text>
+            <Text style={styles.initialsText}>
+              {getInitials(firstName, lastName)}
+            </Text>
           )}
         </Pressable>
       </View>
-
-      <View style={styles.heroSection}>
-        <Text style={styles.heroTitle}>Little Lemon</Text>
-        <Text style={styles.heroSubtitle}>Chicago</Text>
-        <View style={styles.heroImgContainer}>
-          <Text style={styles.heroDescription}>
-            We are a family owned Mediterranean restaurant, focused on
-            traditional recipes served with a modern twist.
-          </Text>
-          <Image
-            source={require("../assets/Hero.png")}
-            style={styles.imgHero}
+      <ScrollView keyboardDismissMode={"on-drag"}>
+        {/* HERO SECTION */}
+        <View style={styles.heroSection}>
+          <Text style={styles.heroTitle}>Little Lemon</Text>
+          <Text style={styles.heroSubtitle}>Chicago</Text>
+          <View style={styles.heroImgContainer}>
+            <Text style={styles.heroDescription}>
+              We are a family owned Mediterranean restaurant, focused on
+              traditional recipes served with a modern twist.
+            </Text>
+            <Image
+              source={require("../assets/Hero.png")}
+              style={styles.imgHero}
+            />
+          </View>
+          <Searchbar
+            placeholder="Search"
+            placeholderTextColor="black"
+            onChangeText={handleSearchChange}
+            value={searchBarText}
+            style={styles.searchBar}
+            iconColor="black"
+            inputStyle={{ color: "black" }}
+            elevation={0}
           />
         </View>
-        <Searchbar
-          placeholder="Search"
-          placeholderTextColor="black"
-          onChangeText={handleSearchChange}
-          value={searchBarText}
-          style={styles.searchBar}
-          iconColor="black"
-          inputStyle={{ color: "black" }}
-          elevation={0}
-        />
-      </View>
+        {/* FILTER SECTION */}
+        <View style={styles.container}>
+          <Text style={styles.orderTxt}>ORDER FOR DELIVERY!</Text>
+          <Filters
+            selections={filterSelections}
+            onChange={handleFiltersChange}
+            sections={sections}
+          />
+          {/* MENU LIST SECTION */}
 
-      <View style={styles.container}>
-        <Text style={styles.orderTxt}>ORDER FOR DELIVERY!</Text>
+          <ScrollView style={styles.sectionList}>
+            {data.map((section) => (
+              <View key={section.name}>
+                {section.data.map((item, index) => (
+                  <View key={index} style={styles.item}>
+                    <View style={styles.menuInfo}>
+                      <Text style={styles.menuTitle}>{item.name}</Text>
+                      <Text style={styles.menuDescription}>
+                        {item.description}
+                      </Text>
+                      <Text style={styles.menuPrice}>${item.price}</Text>
+                    </View>
 
-        <Filters
-          selections={filterSelections}
-          onChange={handleFiltersChange}
-          sections={sections}
-        />
-        <ScrollView style={styles.sectionList}>
-          {data.map((section) => (
-            <View key={section.name}>
-              <Text style={styles.sectionHeader}>
-                {section.name.toUpperCase()}
-              </Text>
-              {section.data.map((item, index) => (
-                <View key={index} style={styles.item}>
-                  <View style={styles.menuInfo}>
-                    <Text style={styles.menuTitle}>{item.name}</Text>
-                    <Text style={styles.menuPrice}>${item.price}</Text>
-                    <Text style={styles.menuDescription}>
-                      {item.description}
-                    </Text>
+                    {item.image === "grilledFish.jpg" ? (
+                      <Image
+                        style={styles.imgDish}
+                        source={require("../assets/Grilledfish.png")}
+                      />
+                    ) : item.name === "Lemon Dessert" ? (
+                      <Image
+                        style={styles.imgDish}
+                        source={require("../assets/Lemondessert.png")}
+                      />
+                    ) : (
+                      <Image
+                        style={styles.imgDish}
+                        source={{
+                          uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
+                        }}
+                      />
+                    )}
                   </View>
-                  <Image
-                    style={styles.imgDish}
-                    source={{
-                      uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${item.image}?raw=true`,
-                    }}
-                  />
-                </View>
-              ))}
-              <View
-                style={{
-                  height: 0.5,
-                  width: "90%",
-                  backgroundColor: "grey",
-                  alignSelf: "center",
-                }}
-              />
-            </View>
-          ))}
-        </ScrollView>
-      </View>
+                ))}
+                <View
+                  style={{
+                    height: 1,
+                    width: "100%",
+                    backgroundColor: "grey",
+                    alignSelf: "center",
+                    marginTop: 20,
+                  }}
+                />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -232,6 +277,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "black",
     fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 15,
   },
   item: {
     flexDirection: "row",
@@ -244,8 +291,10 @@ const styles = StyleSheet.create({
   },
   orderTxt: {
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 20,
     textAlign: "center",
+    fontFamily: "Karla",
+    marginTop: 20,
   },
   avatarButton: {
     width: 50,
@@ -274,7 +323,7 @@ const styles = StyleSheet.create({
   },
   menuInfo: { flex: 1 },
   imgDish: {
-    resizeMode: "contain",
+    resizeMode: "cover",
     width: 120,
     height: 120,
     margin: 10,
@@ -282,13 +331,16 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontWeight: "bold",
     fontSize: 20,
+    fontFamily: "Markazi",
   },
   menuDescription: {
     color: "gray",
+    fontSize: 16,
   },
   menuPrice: {
     color: "gray",
     fontWeight: "bold",
+    fontSize: 18,
   },
   heroSection: {
     backgroundColor: "#495E57",
@@ -300,11 +352,13 @@ const styles = StyleSheet.create({
     fontSize: 60,
     color: "#F4CE14",
     marginTop: -20,
+    fontFamily: "Markazi",
   },
   heroSubtitle: {
-    fontSize: 40,
+    fontSize: 35,
     color: "#EDEFEE",
     marginTop: -20,
+    fontFamily: "Markazi",
   },
   heroImgContainer: {
     flexDirection: "row",
@@ -316,6 +370,7 @@ const styles = StyleSheet.create({
     maxWidth: 200,
     marginTop: 10,
     marginBottom: 10,
+    fontFamily: "Karla",
   },
   imgHero: {
     height: 140,

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
+import * as Font from "expo-font";
 import AppContext from "../context/AppContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Onboarding from "../screens/Onboarding";
@@ -12,6 +13,19 @@ export default function App() {
   const Stack = createNativeStackNavigator();
 
   const { globalState, setGlobalState } = useContext(AppContext);
+
+  const [fontLoaded, setFontLoaded] = useState(false);
+
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        Karla: require("../assets/fonts/Karla-Regular.ttf"),
+        Markazi: require("../assets/fonts/MarkaziText-Regular.ttf"),
+      });
+      setFontLoaded(true);
+    }
+    loadFonts();
+  }, []);
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
@@ -34,7 +48,12 @@ export default function App() {
     };
     checkOnboardingStatus();
   }, []);
+
   if (globalState.isLoading) {
+    return <Splash />;
+  }
+
+  if (!fontLoaded) {
     return <Splash />;
   }
 

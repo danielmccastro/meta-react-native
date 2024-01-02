@@ -25,6 +25,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "fonts": {
+      "Karla": {
+        "regular": "./assets/fonts/Karla-Regular.ttf"
+      },
+      "Markazi": {
+        "regurlar": "./assets/fonts/MarkaziText-Regular.ttf"
+      }
     }
   }
 }

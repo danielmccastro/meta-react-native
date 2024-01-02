@@ -23,8 +23,15 @@ const Filters = ({ onChange, selections, sections }) => {
           }}
         >
           <View>
-            <Text style={{ color: "white", textAlign: "center" }}>
-              {section.toUpperCase()}
+            <Text
+              style={{
+                color: "white",
+                textAlign: "center",
+                fontFamily: "Karla",
+                fontSize: 18,
+              }}
+            >
+              {section[0].toUpperCase() + section.slice(1)}
             </Text>
           </View>
         </TouchableOpacity>
@@ -38,7 +45,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
-  }
+  },
 });
 
 export default Filters;
